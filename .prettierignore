@@ -1,0 +1,10 @@
+node_modules/
+.git/
+.husky/
+*.log
+.DS_Store
+infra/grafana/dashboards/*.json
+dist/
+build/
+coverage/
+.docker/

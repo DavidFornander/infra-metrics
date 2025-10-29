@@ -1,0 +1,47 @@
+{
+  // Markdownlint configuration
+  "config": {
+    // Default state for all rules
+    "default": true,
+    
+    // Disable line length rule (often conflicts with prose)
+    "MD013": false,
+    
+    // Allow bare URLs in documentation
+    "MD034": false,
+    
+    // Allow duplicate headings (common in structured docs)
+    "MD024": false,
+    
+    // Allow inline HTML (sometimes needed for formatting)
+    "MD033": false,
+    
+    // Allow emphasis as heading (for stylistic choices)
+    "MD036": false,
+    
+    // Relax heading style requirements
+    "MD022": {
+      "lines_above": 1,
+      "lines_below": 1
+    },
+    
+    // Relax list spacing requirements
+    "MD032": false,
+    
+    // Allow fenced code without language
+    "MD040": false,
+    
+    // Relax fence spacing
+    "MD031": false,
+    
+    // Allow trailing punctuation in headings
+    "MD026": false
+  },
+  
+  // Ignore patterns
+  "ignores": [
+    "node_modules/**",
+    ".git/**",
+    "**/node_modules/**"
+  ]
+}

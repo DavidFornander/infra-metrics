@@ -1,0 +1,32 @@
+{
+  "name": "infra-metrics",
+  "version": "1.0.0",
+  "description": "Platform observability infrastructure with Prometheus, Grafana, Tempo, and OpenTelemetry",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "format": "prettier --write \"**/*.{md,yml,yaml,json}\"",
+    "format:check": "prettier --check \"**/*.{md,yml,yaml,json}\"",
+    "lint": "npm run lint:md && npm run lint:yaml",
+    "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\"",
+    "lint:yaml": "prettier --check \"**/*.{yml,yaml}\"",
+    "lint:fix": "npm run format && markdownlint-cli2 --fix \"**/*.md\" \"#node_modules\""
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "markdownlint-cli2": "^0.14.0",
+    "prettier": "^3.3.3"
+  },
+  "lint-staged": {
+    "*.{yml,yaml,json}": [
+      "prettier --write"
+    ],
+    "*.md": [
+      "prettier --write",
+      "markdownlint-cli2 --fix"
+    ]
+  }
+}
