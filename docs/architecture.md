@@ -160,3 +160,4 @@ Once running, add services one at a time.
   - OTel instrumentation
   - An SLO with working alerts
   - catalog/ contains metadata for at least that service.
+  
