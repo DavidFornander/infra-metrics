@@ -48,13 +48,13 @@ platform-observability/
 
 ## What Each Part Does (Short, Straight)
 
-| Directory     | Purpose |
-|---------------|---------|
+| Directory     | Purpose                                                                               |
+| ------------- | ------------------------------------------------------------------------------------- |
 | infra/        | Runs the actual monitoring tools (Prometheus, Grafana, OTel, Alertmanager, Blackbox). |
-| environments/ | Defines which services are monitored in dev / stage / prod. Only the targets change. |
-| catalog/      | List of your services and who owns them (metadata only, no code). |
-| docs/         | How the system works, how to define SLOs, and what to do during incidents. |
-| scripts/      | Optional automation helpers. |
+| environments/ | Defines which services are monitored in dev / stage / prod. Only the targets change.  |
+| catalog/      | List of your services and who owns them (metadata only, no code).                     |
+| docs/         | How the system works, how to define SLOs, and what to do during incidents.            |
+| scripts/      | Optional automation helpers.                                                          |
 
 ---
 

@@ -16,6 +16,7 @@ This satisfies **Step 2** of your plan.
 ## Current Docker Stack Status
 
 ### ✅ Configured and Ready
+
 - Docker Compose file with all 6 services
 - Boot order implemented via `depends_on`
 - Volumes for data persistence
@@ -23,6 +24,7 @@ This satisfies **Step 2** of your plan.
 - Tempo configuration file
 
 ### ⚠️ Needs Configuration (Before First Run)
+
 These files exist but are empty - you'll configure them in Steps 3-11:
 
 1. `prometheus/prometheus.yml` - Step 3 (service targets)
@@ -38,11 +40,13 @@ These files exist but are empty - you'll configure them in Steps 3-11:
 ## Key Concepts to Understand
 
 ### 1. **The Boot Order Matters**
+
 ```
 Tempo → OTel → Prometheus → Alertmanager → Grafana → Blackbox
 ```
 
 **Why?**
+
 - OTel needs Tempo running to send traces
 - Prometheus needs OTel running (for optional metrics)
 - Alertmanager needs Prometheus (to receive alerts)
@@ -52,6 +56,7 @@ Tempo → OTel → Prometheus → Alertmanager → Grafana → Blackbox
 The docker-compose.yml handles this automatically with `depends_on`.
 
 ### 2. **Port Mappings**
+
 ```
 3000  → Grafana UI (your main dashboard)
 9090  → Prometheus UI (metrics browser)
@@ -62,7 +67,9 @@ The docker-compose.yml handles this automatically with `depends_on`.
 ```
 
 ### 3. **Data Persistence**
+
 Three Docker volumes store data across restarts:
+
 - `prometheus-data` - 15 days of metrics
 - `grafana-data` - Dashboards, users
 - `tempo-data` - 48 hours of traces
@@ -109,17 +116,20 @@ When you run `docker-compose up -d`:
 ## What You Can Do Right Now
 
 ### Option A: Start the Stack (It Will Work, Just Empty)
+
 ```bash
 cd infra/
 docker-compose up -d
 ```
 
 Then visit:
+
 - http://localhost:3000 (Grafana - login: admin/admin)
 - http://localhost:9090 (Prometheus - will show no targets)
 - http://localhost:3200 (Tempo - ready but no traces)
 
 ### Option B: Wait Until Configuration is Ready
+
 Complete Steps 3-11 first (configure files), then start the stack.
 
 ---
@@ -127,6 +137,7 @@ Complete Steps 3-11 first (configure files), then start the stack.
 ## What This Enables Going Forward
 
 ### ✅ You can now:
+
 1. **See the full architecture** - The docker-compose.yml is your single source of truth
 2. **Reference port numbers** - When configuring services
 3. **Understand dependencies** - What needs what
@@ -134,6 +145,7 @@ Complete Steps 3-11 first (configure files), then start the stack.
 5. **Plan configurations** - You know what files to fill in
 
 ### 📋 Next Steps in Your Plan:
+
 - **Step 3**: Create target files (dev/stage/prod) with service hostnames
 - **Step 4**: Define SLO template and burn rate windows
 - **Step 5-9**: Create placeholder configs for each component
@@ -146,9 +158,11 @@ Complete Steps 3-11 first (configure files), then start the stack.
 ## Critical Things to Remember
 
 ### 1. **Local vs Production**
+
 This docker-compose.yml is for **local development**.
 
 For production you'd need:
+
 - Separate docker-compose files per environment
 - Resource limits
 - Health checks
@@ -157,21 +171,27 @@ For production you'd need:
 - Persistent volume backups
 
 ### 2. **Network Communication**
+
 Inside Docker, services talk by container name:
+
 - `http://prometheus:9090`
 - `http://tempo:3200`
 - `http://otel-collector:4317`
 
 Outside Docker, you use `localhost`:
+
 - `http://localhost:9090`
 
 ### 3. **Configuration Reload**
+
 - **Prometheus**: Can reload config without restart: `curl -X POST http://localhost:9090/-/reload`
 - **Grafana**: Auto-provisions on startup (requires restart for changes)
 - **Alertmanager**: Can reload: `curl -X POST http://localhost:9093/-/reload`
 
 ### 4. **Volumes are Precious**
+
 If you run `docker-compose down -v`, you lose:
+
 - All metrics history
 - All Grafana dashboards (if not provisioned)
 - All traces
@@ -210,6 +230,7 @@ docker-compose up -d --force-recreate
 ## You're Ready When...
 
 ✅ You understand:
+
 1. What each of the 6 services does
 2. Why the boot order matters
 3. What ports each service uses
@@ -217,6 +238,7 @@ docker-compose up -d --force-recreate
 5. What configuration files you need to create next
 
 ✅ You can answer:
+
 - "Where do services send traces?" → `otel-collector:4317`
 - "Where does Prometheus store data?" → `prometheus-data` volume
 - "How do I access Grafana?" → `http://localhost:3000`

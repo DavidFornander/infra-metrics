@@ -21,20 +21,21 @@ This runs independently of application repos.
 
 ## Core Components
 
-| Component | Role |
-|-----------|------|
-| Prometheus | Scrapes metrics from services and exporters. Stores time-series data. |
-| Alertmanager | Processes alerts from Prometheus and sends notifications. |
-| Grafana | UI for dashboards and visualizations. |
+| Component               | Role                                                                                |
+| ----------------------- | ----------------------------------------------------------------------------------- |
+| Prometheus              | Scrapes metrics from services and exporters. Stores time-series data.               |
+| Alertmanager            | Processes alerts from Prometheus and sends notifications.                           |
+| Grafana                 | UI for dashboards and visualizations.                                               |
 | OpenTelemetry Collector | Receives traces + metrics and routes them (mainly to Prometheus + a trace backend). |
-| **Grafana Tempo** | Stores and lets you query distributed traces. Simple, native Grafana integration. |
-| Blackbox Exporter | Performs external HTTP/TLS uptime probes. |
+| **Grafana Tempo**       | Stores and lets you query distributed traces. Simple, native Grafana integration.   |
+| Blackbox Exporter       | Performs external HTTP/TLS uptime probes.                                           |
 
 ### Trace Backend Decision
 
 **Choice: Grafana Tempo**
 
 Reasons:
+
 - Simple single-binary deployment
 - Native integration with Grafana (no separate UI)
 - Good performance for small-to-medium scale

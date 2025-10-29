@@ -15,7 +15,7 @@ services:
   # ─────────────────────────────────────────────────────────────
   # 1. TRACE BACKEND (Choose ONE: Tempo or Jaeger)
   # ─────────────────────────────────────────────────────────────
-  
+
   # Option A: Grafana Tempo (Recommended for simplicity)
   tempo:
     image: grafana/tempo:latest
@@ -25,7 +25,7 @@ services:
       - ./tempo/tempo.yml:/etc/tempo.yaml:ro
       - tempo-data:/var/tempo
     ports:
-      - "3200:3200"   # Tempo HTTP API (for queries from Grafana)
+      - "3200:3200" # Tempo HTTP API (for queries from Grafana)
     networks:
       - observability
     restart: unless-stopped
@@ -51,7 +51,7 @@ services:
   # ─────────────────────────────────────────────────────────────
   # 2. OPENTELEMETRY COLLECTOR
   # ─────────────────────────────────────────────────────────────
-  
+
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
     container_name: otel-collector
@@ -59,9 +59,9 @@ services:
     volumes:
       - ./otel-collector/config.yml:/etc/otel-collector-config.yml:ro
     ports:
-      - "4317:4317"   # OTLP gRPC receiver (services send traces here)
-      - "4318:4318"   # OTLP HTTP receiver
-      - "8888:8888"   # Prometheus metrics about the collector itself
+      - "4317:4317" # OTLP gRPC receiver (services send traces here)
+      - "4318:4318" # OTLP HTTP receiver
+      - "8888:8888" # Prometheus metrics about the collector itself
       - "13133:13133" # Health check
     networks:
       - observability
@@ -73,23 +73,23 @@ services:
   # ─────────────────────────────────────────────────────────────
   # 3. PROMETHEUS (Metrics + Time Series DB)
   # ─────────────────────────────────────────────────────────────
-  
+
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention.time=15d'  # Adjust retention as needed
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
-      - '--web.enable-lifecycle'  # Allows config reload via API
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=15d" # Adjust retention as needed
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+      - "--web.enable-lifecycle" # Allows config reload via API
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./prometheus/rules:/etc/prometheus/rules:ro
       - prometheus-data:/prometheus
     ports:
-      - "9090:9090"   # Prometheus UI
+      - "9090:9090" # Prometheus UI
     networks:
       - observability
     depends_on:
@@ -99,17 +99,17 @@ services:
   # ─────────────────────────────────────────────────────────────
   # 4. ALERTMANAGER (Alert Routing)
   # ─────────────────────────────────────────────────────────────
-  
+
   alertmanager:
     image: prom/alertmanager:latest
     container_name: alertmanager
     command:
-      - '--config.file=/etc/alertmanager/alertmanager.yml'
-      - '--storage.path=/alertmanager'
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
     volumes:
       - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
     ports:
-      - "9093:9093"   # Alertmanager UI
+      - "9093:9093" # Alertmanager UI
     networks:
       - observability
     depends_on:
@@ -119,22 +119,22 @@ services:
   # ─────────────────────────────────────────────────────────────
   # 5. GRAFANA (Dashboards + Visualization)
   # ─────────────────────────────────────────────────────────────
-  
+
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin  # CHANGE THIS IN PRODUCTION
+      - GF_SECURITY_ADMIN_PASSWORD=admin # CHANGE THIS IN PRODUCTION
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_SERVER_ROOT_URL=http://localhost:3001
-      - GF_INSTALL_PLUGINS=  # Add plugins if needed
+      - GF_INSTALL_PLUGINS= # Add plugins if needed
     volumes:
       - ./grafana/datasources:/etc/grafana/provisioning/datasources:ro
       - ./grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
       - grafana-data:/var/lib/grafana
     ports:
-      - "3001:3000"   # Grafana UI (changed to 3001 to avoid conflict with open-webui)
+      - "3001:3000" # Grafana UI (changed to 3001 to avoid conflict with open-webui)
     networks:
       - observability
     depends_on:
@@ -145,16 +145,16 @@ services:
   # ─────────────────────────────────────────────────────────────
   # 6. BLACKBOX EXPORTER (Synthetic Monitoring)
   # ─────────────────────────────────────────────────────────────
-  
+
   blackbox:
     image: prom/blackbox-exporter:latest
     container_name: blackbox-exporter
     command:
-      - '--config.file=/etc/blackbox/blackbox.yml'
+      - "--config.file=/etc/blackbox/blackbox.yml"
     volumes:
       - ./blackbox/blackbox.yml:/etc/blackbox/blackbox.yml:ro
     ports:
-      - "9115:9115"   # Blackbox metrics endpoint
+      - "9115:9115" # Blackbox metrics endpoint
     networks:
       - observability
     depends_on:

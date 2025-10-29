@@ -23,14 +23,14 @@ docker-compose down -v
 
 ## Service URLs (Once Running)
 
-| Service | URL | Purpose |
-|---------|-----|---------|
-| Grafana | <http://localhost:3001> | Dashboards (admin/admin) |
-| Prometheus | <http://localhost:9090> | Metrics browser |
-| Alertmanager | <http://localhost:9093> | Alert status |
-| Tempo | <http://localhost:3200> | Trace backend API |
-| Blackbox | <http://localhost:9115> | Probe metrics |
-| OTel Collector | <http://localhost:13133> | Health check |
+| Service        | URL                      | Purpose                  |
+| -------------- | ------------------------ | ------------------------ |
+| Grafana        | <http://localhost:3001>  | Dashboards (admin/admin) |
+| Prometheus     | <http://localhost:9090>  | Metrics browser          |
+| Alertmanager   | <http://localhost:9093>  | Alert status             |
+| Tempo          | <http://localhost:3200>  | Trace backend API        |
+| Blackbox       | <http://localhost:9115>  | Probe metrics            |
+| OTel Collector | <http://localhost:13133> | Health check             |
 
 **Note**: Grafana uses port 3001 (not 3000) to avoid conflicts with other local services.
 
@@ -50,6 +50,7 @@ This is handled automatically via `depends_on` in docker-compose.yml.
 ## What Each Service Does
 
 ### Tempo (Trace Backend)
+
 - **Image**: `grafana/tempo:latest`
 - **Ports**: 3200 (HTTP), 4317 (OTLP gRPC), 4318 (OTLP HTTP)
 - **Purpose**: Stores distributed traces
@@ -57,6 +58,7 @@ This is handled automatically via `depends_on` in docker-compose.yml.
 - **Data**: Stored in `tempo-data` volume
 
 ### OpenTelemetry Collector
+
 - **Image**: `otel/opentelemetry-collector-contrib:latest`
 - **Ports**: 4317 (OTLP gRPC), 4318 (HTTP), 8888 (self-metrics)
 - **Purpose**: Receives traces/metrics from services and routes them
@@ -64,6 +66,7 @@ This is handled automatically via `depends_on` in docker-compose.yml.
 - **Flow**: Services → OTel → Tempo (traces) + Prometheus (metrics)
 
 ### Prometheus
+
 - **Image**: `prom/prometheus:latest`
 - **Port**: 9090
 - **Purpose**: Time-series database for metrics
@@ -72,12 +75,14 @@ This is handled automatically via `depends_on` in docker-compose.yml.
 - **Data**: Stored in `prometheus-data` volume
 
 ### Alertmanager
+
 - **Image**: `prom/alertmanager:latest`
 - **Port**: 9093
 - **Purpose**: Routes alerts to Slack/Email/Pager
 - **Config**: `alertmanager/alertmanager.yml`
 
 ### Grafana
+
 - **Image**: `grafana/grafana:latest`
 - **Port**: 3000
 - **Purpose**: Dashboard UI
@@ -86,6 +91,7 @@ This is handled automatically via `depends_on` in docker-compose.yml.
 - **Data**: Stored in `grafana-data` volume
 
 ### Blackbox Exporter
+
 - **Image**: `prom/blackbox-exporter:latest`
 - **Port**: 9115
 - **Purpose**: External HTTP/TLS/TCP probes
@@ -106,6 +112,7 @@ These Docker volumes persist data across container restarts:
 All services run on a shared `observability` bridge network.
 
 This allows:
+
 - Services to communicate by container name (e.g., `http://prometheus:9090`)
 - Isolation from other Docker networks
 - Easy service discovery
@@ -126,12 +133,14 @@ Before first run, you need to populate these files:
 ## Choosing Between Tempo and Jaeger
 
 ### Use Tempo if:
+
 - ✅ You want simplicity (fewer moving parts)
 - ✅ You're already using Grafana
 - ✅ You don't need advanced sampling strategies
 - ✅ You want native Grafana integration
 
 ### Use Jaeger if:
+
 - ✅ You need the Jaeger UI's specific features
 - ✅ You have existing Jaeger infrastructure
 - ✅ You need adaptive sampling
@@ -139,6 +148,7 @@ Before first run, you need to populate these files:
 **Current choice**: Tempo (configured)
 
 To switch to Jaeger:
+
 1. Comment out the `tempo` service in docker-compose.yml
 2. Uncomment the `jaeger` service
 3. Update `otel-collector/config.yml` to export to Jaeger instead of Tempo
@@ -153,7 +163,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2'
+          cpus: "2"
           memory: 2G
 ```
 
@@ -162,6 +172,7 @@ services:
 OTel Collector exposes a health endpoint at `:13133/health`
 
 Check it with:
+
 ```bash
 curl http://localhost:13133
 ```
@@ -169,6 +180,7 @@ curl http://localhost:13133
 ## Troubleshooting
 
 ### Services won't start
+
 ```bash
 # Check logs for the failing service
 docker-compose logs <service-name>
@@ -180,16 +192,19 @@ docker-compose logs <service-name>
 ```
 
 ### Prometheus can't scrape targets
+
 - Check that target services are reachable from the `observability` network
 - Verify `/metrics` endpoints are exposed
 - Check `prometheus/prometheus.yml` scrape configs
 
 ### Grafana shows "No data"
+
 - Verify Prometheus datasource is configured in `grafana/datasources/`
 - Check Prometheus is scraping targets successfully (http://localhost:9090/targets)
 - Verify dashboard queries are correct
 
 ### OTel Collector not receiving traces
+
 - Check services are sending to `http://otel-collector:4317` (gRPC) or `:4318` (HTTP)
 - Verify OTel SDK is initialized in your services
 - Check collector logs: `docker-compose logs otel-collector`
