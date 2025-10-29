@@ -171,7 +171,7 @@ The docker-compose.yml in `infra/` enforces this automatically.
 - Grafana has:
   - A Global Overview dashboard.
   - A Service Template dashboard duplicated per service.
-- Tempo/Jaeger shows end-to-end request traces.
+- Tempo shows end-to-end request traces.
 - One service has:
   - /metrics endpoint
   - OTel instrumentation

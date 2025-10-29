@@ -52,7 +52,7 @@ This is handled automatically via `depends_on` in docker-compose.yml.
 ### Tempo (Trace Backend)
 
 - **Image**: `grafana/tempo:latest`
-- **Ports**: 3200 (HTTP), 4317 (OTLP gRPC), 4318 (OTLP HTTP)
+- **Ports**: 3200 (HTTP) - 4317/4318 used internally by OTel Collector
 - **Purpose**: Stores distributed traces
 - **Config**: `tempo/tempo.yml`
 - **Data**: Stored in `tempo-data` volume
@@ -84,7 +84,7 @@ This is handled automatically via `depends_on` in docker-compose.yml.
 ### Grafana
 
 - **Image**: `grafana/grafana:latest`
-- **Port**: 3000
+- **Port**: 3001 (external), 3000 (internal container port)
 - **Purpose**: Dashboard UI
 - **Login**: admin/admin (CHANGE IN PRODUCTION)
 - **Config**: Auto-provisions datasources and dashboards
@@ -123,12 +123,12 @@ Before first run, you need to populate these files:
 
 - [ ] `prometheus/prometheus.yml` - Scrape targets
 - [ ] `prometheus/rules/` - Alert rules
-- [ ] `alertmanager/alertmanager.yml` - Notification routing
+- [x] `alertmanager/alertmanager.yml` - Notification routing (configured with placeholder)
 - [ ] `grafana/datasources/` - Prometheus + Tempo datasources
 - [ ] `grafana/dashboards/` - Dashboard JSON files
-- [ ] `blackbox/blackbox.yml` - Probe modules
-- [x] `otel-collector/config.yml` - Trace/metric pipeline
-- [x] `tempo/tempo.yml` - Trace storage config
+- [x] `blackbox/blackbox.yml` - Probe modules (configured)
+- [x] `otel-collector/config.yml` - Trace/metric pipeline (configured)
+- [x] `tempo/tempo.yml` - Trace storage config (configured)
 
 ## Choosing Between Tempo and Jaeger
 

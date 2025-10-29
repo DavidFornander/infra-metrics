@@ -25,15 +25,15 @@ This satisfies **Step 2** of your plan.
 
 ### ⚠️ Needs Configuration (Before First Run)
 
-These files exist but are empty - you'll configure them in Steps 3-11:
+Configuration status:
 
-1. `prometheus/prometheus.yml` - Step 3 (service targets)
-2. `prometheus/rules/` - Step 4 & 7 (SLO alerts)
-3. `alertmanager/alertmanager.yml` - Step 6 (notification routing)
-4. `grafana/datasources/` - Step 5 (connect to Prometheus + Tempo)
-5. `grafana/dashboards/` - Step 5 (dashboard JSON files)
-6. `blackbox/blackbox.yml` - Step 9 (probe modules)
-7. `otel-collector/config.yml` - Step 8 (trace pipeline)
+1. ✅ `otel-collector/config.yml` - Configured (sends traces to Tempo)
+2. ✅ `alertmanager/alertmanager.yml` - Configured (placeholder null receiver)
+3. ✅ `blackbox/blackbox.yml` - Configured (HTTP/HTTPS/TLS/TCP/ICMP probes)
+4. ⚠️ `prometheus/prometheus.yml` - Empty (Step 3: add service targets)
+5. ⚠️ `prometheus/rules/` - Empty (Step 4 & 7: SLO alerts)
+6. ⚠️ `grafana/datasources/` - Empty (Step 5: connect to Prometheus + Tempo)
+7. ⚠️ `grafana/dashboards/` - Empty (Step 5: dashboard JSON files)
 
 ---
 
@@ -58,7 +58,7 @@ The docker-compose.yml handles this automatically with `depends_on`.
 ### 2. **Port Mappings**
 
 ```
-3000  → Grafana UI (your main dashboard)
+3001  → Grafana UI (your main dashboard)
 9090  → Prometheus UI (metrics browser)
 9093  → Alertmanager UI (alert status)
 3200  → Tempo HTTP API
@@ -124,7 +124,7 @@ docker-compose up -d
 
 Then visit:
 
-- http://localhost:3000 (Grafana - login: admin/admin)
+- http://localhost:3001 (Grafana - login: admin/admin)
 - http://localhost:9090 (Prometheus - will show no targets)
 - http://localhost:3200 (Tempo - ready but no traces)
 
@@ -241,7 +241,7 @@ docker-compose up -d --force-recreate
 
 - "Where do services send traces?" → `otel-collector:4317`
 - "Where does Prometheus store data?" → `prometheus-data` volume
-- "How do I access Grafana?" → `http://localhost:3000`
+- "How do I access Grafana?" → `http://localhost:3001`
 - "What happens if I `down -v`?" → You lose all data
 
 **Status**: You now have a working Docker infrastructure skeleton. It will boot, but won't do anything useful until you configure the individual components (Steps 3-11).
