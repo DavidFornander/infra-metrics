@@ -1,8 +1,6 @@
 # Platform Observability
 
 This repository contains the monitoring, tracing, alerting, and service ownership layer for the system.
-Your actual applications live in their own repositories.
-This repo does not contain application code.
 
 The goal is to provide:
 
@@ -96,8 +94,6 @@ This repository solves that by establishing:
 3. One place to check uptime
 4. One place to understand who owns what
 
-This is the beginning of real operational maturity.
-
 ---
 
 ## How You Will Use This Repo (Practical Flow)
@@ -116,14 +112,3 @@ This is the beginning of real operational maturity.
    - Its dashboard loads
    - Its SLO alert rules evaluate
 4. Repeat for remaining services, one at a time.
-
----
-
-## Backstage (Optional, Later)
-
-Backstage is open-source.
-It is not required.
-You can add it later.
-
-Backstage simply provides a UI for the catalog/ folder.
-Nothing we do here blocks or requires Backstage.
