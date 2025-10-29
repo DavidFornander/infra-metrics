@@ -1,0 +1,23 @@
+global:
+  resolve_timeout: 5m
+
+# Default route - sends all alerts to a placeholder receiver
+route:
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 12h
+  receiver: 'null'
+
+# Placeholder receiver (discards alerts for now)
+# Replace with real receivers in Step 6 (Slack, Email, PagerDuty, etc.)
+receivers:
+  - name: 'null'
+
+# Inhibition rules (optional - prevents noisy alerts)
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'cluster', 'service']
