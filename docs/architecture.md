@@ -27,8 +27,21 @@ This runs independently of application repos.
 | Alertmanager | Processes alerts from Prometheus and sends notifications. |
 | Grafana | UI for dashboards and visualizations. |
 | OpenTelemetry Collector | Receives traces + metrics and routes them (mainly to Prometheus + a trace backend). |
-| Trace Backend (Tempo/Jaeger) | Stores and lets you query distributed traces. |
+| **Grafana Tempo** | Stores and lets you query distributed traces. Simple, native Grafana integration. |
 | Blackbox Exporter | Performs external HTTP/TLS uptime probes. |
+
+### Trace Backend Decision
+
+**Choice: Grafana Tempo**
+
+Reasons:
+- Simple single-binary deployment
+- Native integration with Grafana (no separate UI)
+- Good performance for small-to-medium scale
+- Easy local development with file-based storage
+- Minimal configuration overhead
+
+Alternative considered: Jaeger (more features but more complex)
 
 ---
 
@@ -42,7 +55,7 @@ This runs independently of application repos.
 OpenTelemetry Collector
      │
      ├─ sends metrics → Prometheus (time series)
-     └─ sends traces → Tempo/Jaeger (spans)
+     └─ sends traces → Tempo (spans)
 ```
 
 For external uptime checks:
@@ -137,7 +150,7 @@ infra/alertmanager/alertmanager.yml
 
 ## Boot Sequence (Startup Order)
 
-1. Trace backend (Tempo/Jaeger)
+1. Grafana Tempo (trace backend)
 2. OpenTelemetry Collector
 3. Prometheus
 4. Alertmanager
@@ -145,6 +158,9 @@ infra/alertmanager/alertmanager.yml
 6. Blackbox Exporter
 
 Once running, add services one at a time.
+
+This order ensures each service's dependencies are available when it starts.
+The docker-compose.yml in `infra/` enforces this automatically.
 
 ---
 
@@ -160,4 +176,3 @@ Once running, add services one at a time.
   - OTel instrumentation
   - An SLO with working alerts
   - catalog/ contains metadata for at least that service.
-  
