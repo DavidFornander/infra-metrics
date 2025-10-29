@@ -25,12 +25,14 @@ docker-compose down -v
 
 | Service | URL | Purpose |
 |---------|-----|---------|
-| Grafana | http://localhost:3000 | Dashboards (admin/admin) |
-| Prometheus | http://localhost:9090 | Metrics browser |
-| Alertmanager | http://localhost:9093 | Alert status |
-| Tempo | http://localhost:3200 | Trace backend |
-| Blackbox | http://localhost:9115 | Probe metrics |
-| OTel Collector | http://localhost:13133 | Health check |
+| Grafana | <http://localhost:3001> | Dashboards (admin/admin) |
+| Prometheus | <http://localhost:9090> | Metrics browser |
+| Alertmanager | <http://localhost:9093> | Alert status |
+| Tempo | <http://localhost:3200> | Trace backend API |
+| Blackbox | <http://localhost:9115> | Probe metrics |
+| OTel Collector | <http://localhost:13133> | Health check |
+
+**Note**: Grafana uses port 3001 (not 3000) to avoid conflicts with other local services.
 
 ## Boot Order (Dependency Chain)
 
