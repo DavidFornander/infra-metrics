@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import pino from 'pino';
 import pinoHttp from 'pino-http';
+import healthRoutes from './routes/health';
 
 const logger = pino({
   level: process.env.LOG_LEVEL || 'info',
@@ -19,6 +20,9 @@ export const app = express();
 // Middleware
 app.use(express.json());
 app.use(pinoHttp({ logger }));
+
+// Routes
+app.use(healthRoutes);
 
 // Root endpoint
 app.get('/', (_req: Request, res: Response) => {
