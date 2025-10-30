@@ -98,6 +98,17 @@ The platform configuration stays constant.
 
 ---
 
+## Port Organization
+
+See [`docs/ports.md`](ports.md) for complete port allocation and access information.
+
+**Key ranges:**
+- **Infrastructure**: Various ports (3000s-9000s)
+- **Demo services**: Ports 4000-4100
+- **Production services**: Ports 8000-8999
+
+---
+
 ## Service Catalog
 
 ```text

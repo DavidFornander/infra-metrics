@@ -1,18 +1,5 @@
 # Docker Setup - What You Need to Know
 
-## Decision: Tempo vs Jaeger ✅
-
-**We've chosen Grafana Tempo** for these reasons:
-
-1. **Simpler** - Single binary, minimal configuration
-2. **Native Grafana integration** - No UI to maintain separately
-3. **Good enough** - Handles traces for small-to-medium scale
-4. **Local storage** - Easy to run locally without S3/object storage
-
-This satisfies **Step 2** of your plan.
-
----
-
 ## Current Docker Stack Status
 
 ### ✅ Configured and Ready
@@ -57,14 +44,13 @@ The docker-compose.yml handles this automatically with `depends_on`.
 
 ### 2. **Port Mappings**
 
-```
-3001  → Grafana UI (your main dashboard)
-9090  → Prometheus UI (metrics browser)
-9093  → Alertmanager UI (alert status)
-3200  → Tempo HTTP API
-4317  → OTel gRPC (services send traces here)
-9115  → Blackbox metrics endpoint
-```
+See [`docs/ports.md`](../ports.md) for complete port allocation.
+
+**Quick access:**
+- Grafana: http://localhost:3001
+- Prometheus: http://localhost:9090
+- Tempo: http://localhost:3200
+- Alertmanager: http://localhost:9093
 
 ### 3. **Data Persistence**
 
@@ -243,5 +229,3 @@ docker-compose up -d --force-recreate
 - "Where does Prometheus store data?" → `prometheus-data` volume
 - "How do I access Grafana?" → `http://localhost:3001`
 - "What happens if I `down -v`?" → You lose all data
-
-**Status**: You now have a working Docker infrastructure skeleton. It will boot, but won't do anything useful until you configure the individual components (Steps 3-11).
