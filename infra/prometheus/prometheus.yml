@@ -1,0 +1,83 @@
+global:
+  scrape_interval: 15s # Scrape targets every 15 seconds
+  evaluation_interval: 15s # Evaluate rules every 15 seconds
+  external_labels:
+    cluster: 'local-dev'
+    environment: 'development'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+# Load alerting/recording rules from files
+rule_files:
+  - /etc/prometheus/rules/*.yml
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+
+  # OpenTelemetry Collector metrics
+  - job_name: 'otel-collector'
+    static_configs:
+      - targets: ['otel-collector:8888']
+        labels:
+          service: 'otel-collector'
+
+  # Grafana Tempo metrics
+  - job_name: 'tempo'
+    static_configs:
+      - targets: ['tempo:3200']
+        labels:
+          service: 'tempo'
+
+  # Blackbox Exporter
+  - job_name: 'blackbox-exporter'
+    static_configs:
+      - targets: ['blackbox:9115']
+        labels:
+          service: 'blackbox-exporter'
+
+  # ─────────────────────────────────────────────────────────────
+  # DEMO SERVICES
+  # ─────────────────────────────────────────────────────────────
+
+  # Demo TypeScript Service
+  - job_name: 'demo-typescript'
+    scrape_interval: 10s # More frequent for demo visibility
+    static_configs:
+      - targets: ['demo-typescript:8080']
+        labels:
+          service: 'demo-typescript'
+          environment: 'development'
+          team: 'platform'
+    metrics_path: /metrics
+
+  # Blackbox probes for demo-typescript health checks
+  - job_name: 'blackbox-demo-typescript'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+          - http://demo-typescript:8080/health
+          - http://demo-typescript:8080/ready
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115
+      - source_labels: [__param_target]
+        regex: 'http://demo-typescript:8080/(.*)'
+        target_label: endpoint
+        replacement: '/$1'

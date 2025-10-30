@@ -178,7 +178,7 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
       - LOG_LEVEL=info
     ports:
-      - "5000:8080" # Demo service on port 5000 (local dev standard)
+      - "5001:8080" # Demo service on port 5001 (5000 often used by macOS AirPlay)
     networks:
       - observability
     depends_on:

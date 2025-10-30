@@ -1,0 +1,15 @@
+# Placeholder for Prometheus alerting and recording rules
+# Add your custom rules here
+#
+# Example:
+# groups:
+#   - name: demo-typescript
+#     interval: 30s
+#     rules:
+#       - alert: HighErrorRate
+#         expr: rate(http_requests_total{status_code=~"5.."}[5m]) > 0.05
+#         for: 5m
+#         labels:
+#           severity: warning
+#         annotations:
+#           summary: "High error rate detected"
