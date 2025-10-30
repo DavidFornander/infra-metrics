@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import pino from 'pino';
 import pinoHttp from 'pino-http';
 import healthRoutes from './routes/health';
+import { getMetrics, getMetricsContentType } from './telemetry/metrics';
 
 const logger = pino({
   level: process.env.LOG_LEVEL || 'info',
@@ -23,6 +24,18 @@ app.use(pinoHttp({ logger }));
 
 // Routes
 app.use(healthRoutes);
+
+// Metrics endpoint
+app.get('/metrics', async (_req: Request, res: Response) => {
+  try {
+    res.set('Content-Type', getMetricsContentType());
+    const metrics = await getMetrics();
+    res.send(metrics);
+  } catch (error) {
+    logger.error({ error }, 'Error generating metrics');
+    res.status(500).send('Error generating metrics');
+  }
+});
 
 // Root endpoint
 app.get('/', (_req: Request, res: Response) => {
