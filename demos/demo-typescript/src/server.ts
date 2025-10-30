@@ -3,6 +3,7 @@ import pino from 'pino';
 import pinoHttp from 'pino-http';
 import healthRoutes from './routes/health';
 import { getMetrics, getMetricsContentType } from './telemetry/metrics';
+import { metricsMiddleware } from './middleware/metrics';
 
 const logger = pino({
   level: process.env.LOG_LEVEL || 'info',
@@ -21,6 +22,7 @@ export const app = express();
 // Middleware
 app.use(express.json());
 app.use(pinoHttp({ logger }));
+app.use(metricsMiddleware);
 
 // Routes
 app.use(healthRoutes);
