@@ -1,5 +1,5 @@
 import { NodeSDK } from '@opentelemetry/sdk-node';
-import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-node';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
@@ -9,8 +9,7 @@ import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express';
  * OpenTelemetry Tracing Setup
  * 
  * This module initializes distributed tracing with OpenTelemetry.
- * Currently exports to console for development/debugging.
- * In production, this will export to the OTel Collector via OTLP.
+ * Exports traces to the OpenTelemetry Collector via OTLP/gRPC.
  */
 
 // Define service resource attributes
@@ -20,11 +19,18 @@ const resource = new Resource({
   [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: process.env.NODE_ENV || 'development',
 });
 
+// Configure OTLP trace exporter
+const traceExporter = new OTLPTraceExporter({
+  // OTel Collector endpoint (gRPC)
+  // In Docker: http://otel-collector:4317
+  // Local dev: http://localhost:4317
+  url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://localhost:4317',
+});
+
 // Initialize the OpenTelemetry SDK
 const sdk = new NodeSDK({
   resource,
-  // Trace exporter - console for now (will change to OTLP in next step)
-  traceExporter: new ConsoleSpanExporter(),
+  traceExporter,
   // Automatic instrumentation for HTTP and Express
   instrumentations: [
     new HttpInstrumentation({
@@ -47,7 +53,7 @@ const sdk = new NodeSDK({
  */
 export function startTracing(): void {
   sdk.start();
-  console.log('🔍 OpenTelemetry tracing initialized (console exporter)');
+  console.log('🔍 OpenTelemetry tracing initialized (OTLP exporter)');
 }
 
 /**

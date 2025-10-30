@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import pino from 'pino';
 import pinoHttp from 'pino-http';
 import healthRoutes from './routes/health';
+import apiRoutes from './routes/api';
 import { getMetrics, getMetricsContentType } from './telemetry/metrics';
 import { metricsMiddleware } from './middleware/metrics';
 
@@ -26,6 +27,7 @@ app.use(metricsMiddleware);
 
 // Routes
 app.use(healthRoutes);
+app.use('/api', apiRoutes);
 
 // Metrics endpoint
 app.get('/metrics', async (_req: Request, res: Response) => {
