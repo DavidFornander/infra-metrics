@@ -127,14 +127,14 @@ services:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin # CHANGE THIS IN PRODUCTION
       - GF_USERS_ALLOW_SIGN_UP=false
-      - GF_SERVER_ROOT_URL=http://localhost:3001
+      - GF_SERVER_ROOT_URL=http://localhost:3000
       - GF_INSTALL_PLUGINS= # Add plugins if needed
     volumes:
       - ./grafana/datasources:/etc/grafana/provisioning/datasources:ro
       - ./grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
       - grafana-data:/var/lib/grafana
     ports:
-      - "3001:3000" # Grafana UI (changed to 3001 to avoid conflict with open-webui)
+      - "3000:3000" # Grafana UI (industry standard port)
     networks:
       - observability
     depends_on:
