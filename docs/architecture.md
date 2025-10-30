@@ -102,10 +102,11 @@ The platform configuration stays constant.
 
 See [`docs/ports.md`](ports.md) for complete port allocation and access information.
 
-**Key ranges:**
-- **Infrastructure**: Various ports (3000s-9000s)
-- **Demo services**: Ports 4000-4100
-- **Production services**: Ports 8000-8999
+**Key port categories:**
+- **External Access (UI)**: Grafana (3000), Prometheus (9090), Tempo (3200), Alertmanager (9093)
+- **Service Integration**: OTel Collector OTLP (4317/4318) - for applications to send telemetry
+- **Demo Services**: Local development only (see ports.md for details)
+- **Production Services**: Use service discovery (Kubernetes) - no manual port allocation
 
 ---
 
