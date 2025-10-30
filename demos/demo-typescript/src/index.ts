@@ -1,3 +1,9 @@
+// IMPORTANT: Tracing must be initialized FIRST, before any other imports
+// This allows OpenTelemetry to instrument HTTP and Express automatically
+import { startTracing, stopTracing } from './telemetry/tracing';
+startTracing();
+
+// Now import the rest of the application
 import { app, logger } from './server';
 import { ServerConfig } from './types';
 
@@ -19,8 +25,11 @@ const server = app.listen(config.port, () => {
 });
 
 // Graceful shutdown
-const shutdown = (signal: string) => {
+const shutdown = async (signal: string) => {
   logger.info({ signal }, 'Received shutdown signal');
+  
+  // Shutdown tracing first
+  await stopTracing();
   
   server.close(() => {
     logger.info('HTTP server closed');
