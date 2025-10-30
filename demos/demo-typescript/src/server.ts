@@ -6,16 +6,22 @@ import apiRoutes from './routes/api';
 import { getMetrics, getMetricsContentType } from './telemetry/metrics';
 import { metricsMiddleware } from './middleware/metrics';
 
+// Configure logger based on environment
+// Use pino-pretty for local dev, JSON for production
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
 const logger = pino({
   level: process.env.LOG_LEVEL || 'info',
-  transport: {
-    target: 'pino-pretty',
-    options: {
-      colorize: true,
-      translateTime: 'HH:MM:ss Z',
-      ignore: 'pid,hostname',
+  ...(isDevelopment && {
+    transport: {
+      target: 'pino-pretty',
+      options: {
+        colorize: true,
+        translateTime: 'HH:MM:ss Z',
+        ignore: 'pid,hostname',
+      },
     },
-  },
+  }),
 });
 
 export const app = express();
