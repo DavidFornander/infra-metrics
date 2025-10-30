@@ -47,7 +47,7 @@ The docker-compose.yml handles this automatically with `depends_on`.
 See [`docs/ports.md`](../ports.md) for complete port allocation.
 
 **Quick access:**
-- Grafana: http://localhost:3001
+- Grafana: http://localhost:3000
 - Prometheus: http://localhost:9090
 - Tempo: http://localhost:3200
 - Alertmanager: http://localhost:9093
@@ -110,7 +110,7 @@ docker-compose up -d
 
 Then visit:
 
-- http://localhost:3001 (Grafana - login: admin/admin)
+- http://localhost:3000 (Grafana - login: admin/admin)
 - http://localhost:9090 (Prometheus - will show no targets)
 - http://localhost:3200 (Tempo - ready but no traces)
 
@@ -227,5 +227,5 @@ docker-compose up -d --force-recreate
 
 - "Where do services send traces?" → `otel-collector:4317`
 - "Where does Prometheus store data?" → `prometheus-data` volume
-- "How do I access Grafana?" → `http://localhost:3001`
+- "How do I access Grafana?" → `http://localhost:3000`
 - "What happens if I `down -v`?" → You lose all data
