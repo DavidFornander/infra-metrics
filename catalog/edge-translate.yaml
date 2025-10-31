@@ -1,0 +1,96 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: edge-translate
+  description: Edge Translate API service providing language translation capabilities
+  annotations:
+    github.com/project-slug: DavidFornander/infra-metrics
+  tags:
+    - translation
+    - api
+    - language-processing
+    - observability
+    - edge
+  links:
+    - url: http://192.168.0.88:3000
+      title: Edge Translate API
+      icon: web
+    - url: http://192.168.0.88:3000/metrics
+      title: Prometheus Metrics
+      icon: dashboard
+    - url: http://localhost:3000
+      title: Grafana Dashboards
+      icon: dashboard
+    - url: http://localhost:9090
+      title: Prometheus (Query Metrics)
+      icon: search
+
+spec:
+  type: service
+  lifecycle: production
+  owner: platform-team
+  system: translation-services
+
+  # Dependencies
+  dependsOn:
+    - component:otel-collector
+    - component:prometheus
+    - component:tempo
+    - component:grafana
+
+  # API Specification
+  providesApis:
+    - edge-translate-api
+
+  # API Definition
+  apiVersion: backstage.io/v1alpha1
+  kind: API
+  metadata:
+    name: edge-translate-api
+    description: REST API for text translation services
+  spec:
+    type: openapi
+    lifecycle: production
+    owner: platform-team
+    definition:
+      $schema: https://json-schema.org/draft-07/schema#
+      type: object
+      properties:
+        endpoints:
+          type: array
+          items:
+            type: object
+            properties:
+              path:
+                type: string
+                example: "/translate"
+              method:
+                type: string
+                enum: ["GET", "POST"]
+              description:
+                type: string
+                example: "Translate text from one language to another"
+        health:
+          type: object
+          properties:
+            path:
+              type: string
+              example: "/health"
+            method:
+              type: string
+              example: "GET"
+            description:
+              type: string
+              example: "Service health check endpoint"
+        metrics:
+          type: object
+          properties:
+            path:
+              type: string
+              example: "/metrics"
+            method:
+              type: string
+              example: "GET"
+            description:
+              type: string
+              example: "Prometheus metrics endpoint"

@@ -61,6 +61,17 @@ scrape_configs:
           team: 'platform'
     metrics_path: /metrics
 
+  # Translation API Service
+  - job_name: 'edge-translate'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['192.168.0.88:3000']
+        labels:
+          service: 'edge-translate'
+          environment: 'development'
+          team: 'platform'
+    metrics_path: /metrics
+
   # Blackbox probes for demo-typescript health checks
   - job_name: 'blackbox-demo-typescript'
     metrics_path: /probe
@@ -79,5 +90,26 @@ scrape_configs:
         replacement: blackbox:9115
       - source_labels: [__param_target]
         regex: 'http://demo-typescript:8080/(.*)'
+        target_label: endpoint
+        replacement: '/$1'
+
+  # Blackbox probes for translation-api health checks
+  - job_name: 'blackbox-edge-translate'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+          - http://192.168.0.88:3000/health
+          - http://192.168.0.88:3000/ready
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115
+      - source_labels: [__param_target]
+        regex: 'http://192.168.0.88:3000/(.*)'
         target_label: endpoint
         replacement: '/$1'
