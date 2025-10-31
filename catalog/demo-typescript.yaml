@@ -1,0 +1,348 @@
+---
+# Service Catalog Entry
+# Following Backstage/Spotify service catalog format
+# https://backstage.io/docs/features/software-catalog/descriptor-format
+
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: demo-typescript
+  description: Reference TypeScript service demonstrating observability best practices with OpenTelemetry, Prometheus, and distributed tracing
+  annotations:
+    github.com/project-slug: DavidFornander/infra-metrics
+    backstage.io/techdocs-ref: dir:../../demos/demo-typescript
+  tags:
+    - typescript
+    - nodejs
+    - express
+    - opentelemetry
+    - prometheus
+    - observability
+    - demo
+    - reference-implementation
+  links:
+    - url: http://localhost:5001
+      title: Service (Local Dev)
+      icon: web
+    - url: http://localhost:5001/metrics
+      title: Prometheus Metrics
+      icon: dashboard
+    - url: http://localhost:3000
+      title: Grafana Dashboards
+      icon: dashboard
+    - url: http://localhost:9090
+      title: Prometheus (Query Metrics)
+      icon: search
+
+spec:
+  type: service
+  lifecycle: experimental
+  owner: platform-team
+  system: observability-demos
+  
+  # Dependencies
+  dependsOn:
+    - component:otel-collector
+    - component:prometheus
+    - component:tempo
+    - component:grafana
+  
+  # API Specification
+  providesApis:
+    - demo-typescript-api
+  
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: demo-typescript-api
+  description: REST API for demo-typescript service
+spec:
+  type: openapi
+  lifecycle: experimental
+  owner: platform-team
+  definition: |
+    openapi: 3.0.0
+    info:
+      title: Demo TypeScript API
+      version: 1.0.0
+      description: Reference service demonstrating observability patterns
+    
+    servers:
+      - url: http://localhost:5001
+        description: Local development
+    
+    paths:
+      /health:
+        get:
+          summary: Liveness probe
+          description: Returns service health status and uptime
+          responses:
+            '200':
+              description: Service is healthy
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: healthy
+                      timestamp:
+                        type: string
+                        format: date-time
+                      uptime:
+                        type: number
+                        description: Uptime in seconds
+      
+      /ready:
+        get:
+          summary: Readiness probe
+          description: Returns whether service is ready to accept traffic
+          responses:
+            '200':
+              description: Service is ready
+      
+      /metrics:
+        get:
+          summary: Prometheus metrics endpoint
+          description: Exports metrics in Prometheus exposition format
+          responses:
+            '200':
+              description: Metrics in Prometheus format
+              content:
+                text/plain:
+                  schema:
+                    type: string
+      
+      /api/users:
+        get:
+          summary: List all users
+          description: Returns a list of mock users (for testing/demo purposes)
+          responses:
+            '200':
+              description: List of users
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      users:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/User'
+                      count:
+                        type: number
+      
+      /api/users/{id}:
+        get:
+          summary: Get user by ID
+          parameters:
+            - name: id
+              in: path
+              required: true
+              schema:
+                type: integer
+          responses:
+            '200':
+              description: User found
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/User'
+            '404':
+              description: User not found
+      
+      /api/slow:
+        get:
+          summary: Slow endpoint (latency testing)
+          description: Returns after a random delay (500-2000ms) for testing latency monitoring
+          responses:
+            '200':
+              description: Response after delay
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                      delay_ms:
+                        type: number
+                      timestamp:
+                        type: string
+                        format: date-time
+    
+    components:
+      schemas:
+        User:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            email:
+              type: string
+              format: email
+            role:
+              type: string
+              enum: [admin, moderator, user]
+
+---
+# Service Level Objectives (SLOs)
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: demo-typescript-slos
+  description: Service Level Objectives for demo-typescript
+spec:
+  type: slo
+  owner: platform-team
+  dependsOn:
+    - component:demo-typescript
+  
+  slos:
+    # Availability SLO
+    - name: availability
+      description: Service should be available 99.5% of the time
+      target: 99.5
+      window: 30d
+      indicator:
+        type: availability
+        query: |
+          (
+            sum(rate(http_requests_total{job="demo-typescript", status_code!~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total{job="demo-typescript"}[5m]))
+          ) * 100
+    
+    # Latency SLO (excluding /api/slow which is intentionally slow)
+    - name: latency-p95
+      description: 95% of requests should complete within 200ms (excluding /api/slow)
+      target: 200
+      unit: milliseconds
+      window: 30d
+      indicator:
+        type: latency
+        percentile: 95
+        query: |
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket{
+              job="demo-typescript",
+              route!="/slow"
+            }[5m])) by (le)
+          ) * 1000
+    
+    # Error Rate SLO
+    - name: error-rate
+      description: Error rate should be below 1%
+      target: 1.0
+      window: 30d
+      indicator:
+        type: error_rate
+        query: |
+          (
+            sum(rate(http_requests_total{job="demo-typescript", status_code=~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total{job="demo-typescript"}[5m]))
+          ) * 100
+
+---
+# Operational Information
+metadata:
+  name: demo-typescript-ops
+  description: Operational runbook and contact information
+
+operations:
+  owner:
+    team: platform-team
+    slack: "#platform-observability"
+    email: platform-team@example.com
+  
+  on-call:
+    schedule: https://example.pagerduty.com/schedules/platform
+    escalation: https://example.pagerduty.com/escalation_policies/platform
+  
+  runbooks:
+    - name: Service Restart
+      url: https://github.com/DavidFornander/infra-metrics/blob/main/demos/demo-typescript/README.md#troubleshooting
+      description: How to restart the service if it becomes unhealthy
+    
+    - name: High Latency Investigation
+      url: https://github.com/DavidFornander/infra-metrics/blob/main/demos/demo-typescript/README.md#debugging-performance
+      description: Steps to investigate slow request times
+    
+    - name: Trace Analysis
+      url: https://github.com/DavidFornander/infra-metrics/blob/main/demos/demo-typescript/README.md#viewing-traces
+      description: How to view distributed traces in Grafana/Tempo
+  
+  monitoring:
+    dashboards:
+      - name: Demo TypeScript Overview
+        url: http://localhost:3000/dashboards
+        description: Service health, request rates, latency, errors
+    
+    alerts:
+      - name: DemoTypescriptDown
+        severity: critical
+        description: Service is not responding to health checks
+      
+      - name: DemoTypescriptHighErrorRate
+        severity: warning
+        description: Error rate > 5% for 5 minutes
+      
+      - name: DemoTypescriptHighLatency
+        severity: warning
+        description: P95 latency > 500ms for 5 minutes
+  
+  deployment:
+    type: docker-compose
+    repository: https://github.com/DavidFornander/infra-metrics
+    dockerfile: demos/demo-typescript/Dockerfile
+    compose-file: infra/docker-compose.yml
+    
+    environment-variables:
+      - name: NODE_ENV
+        description: Node.js environment (development/production)
+        required: true
+        default: production
+      
+      - name: PORT
+        description: HTTP server port
+        required: true
+        default: "8080"
+      
+      - name: OTEL_SERVICE_NAME
+        description: Service name for OpenTelemetry
+        required: true
+        default: demo-typescript
+      
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        description: OpenTelemetry Collector endpoint (gRPC)
+        required: true
+        default: http://otel-collector:4317
+      
+      - name: LOG_LEVEL
+        description: Logging level (debug/info/warn/error)
+        required: false
+        default: info
+    
+    ports:
+      - container: 8080
+        host: 5001
+        description: HTTP API and metrics endpoint
+    
+    health-check:
+      path: /health
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    
+    resources:
+      limits:
+        memory: 512M
+        cpu: "0.5"
+      requests:
+        memory: 256M
+        cpu: "0.25"
