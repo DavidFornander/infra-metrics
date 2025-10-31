@@ -22,23 +22,23 @@ exporters:
     tls:
       insecure: true
 
-  # Optional: Send metrics to Prometheus (if needed)
-  # prometheus:
-  #   endpoint: "0.0.0.0:8889"
-
   # Debug exporter for troubleshooting
   debug:
     verbosity: detailed
 
 service:
+  # Expose internal telemetry metrics for Prometheus scraping
+  telemetry:
+    metrics:
+      readers:
+        - pull:
+            exporter:
+              prometheus:
+                host: '0.0.0.0'
+                port: 8888
+  
   pipelines:
     traces:
       receivers: [otlp]
       processors: [memory_limiter, batch]
       exporters: [otlp, debug]
-
-    # Uncomment if you want to forward metrics through OTel
-    # metrics:
-    #   receivers: [otlp]
-    #   processors: [memory_limiter, batch]
-    #   exporters: [prometheus]
